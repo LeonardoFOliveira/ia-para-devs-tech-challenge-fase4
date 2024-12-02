@@ -1,0 +1,16 @@
+Resumo da Análise do Vídeo:
+
+- Total de frames analisados: 2633
+- Emoções predominantes:
+  - neutral: 863 ocorrências
+  - sad: 642 ocorrências
+  - happy: 441 ocorrências
+  - fear: 342 ocorrências
+  - surprise: 193 ocorrências
+  - angry: 112 ocorrências
+  - unknown: 40 ocorrências
+- Atividades predominantes:
+  - Analisando...: 2472 ocorrências
+  - atividade_desconhecida: 149 ocorrências
+  - correndo: 12 ocorrências
+- Número de anomalias detectadas (caretas): 7

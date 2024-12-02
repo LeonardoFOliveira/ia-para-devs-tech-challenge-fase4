@@ -1,6 +1,6 @@
 opencv-python
-dlib
 deepface
+mediapipe
 torch
 torchvision
 joblib

@@ -12,9 +12,23 @@ class ActivityDetector:
         self.transform = transforms.Compose([
             transforms.Resize((112, 112)),
             transforms.ToTensor(),
+            transforms.Normalize(
+                mean=[0.43216, 0.394666, 0.37645],
+                std=[0.22803, 0.22145, 0.216989]
+            )
         ])
-        self.sequence_length = 16
+        self.sequence_length = 8
         self.frames = []
+        # Carrega as labels do arquivo
+        self.labels = self.load_labels('label_map.txt')
+
+    def load_labels(self, filepath):
+        labels = []
+        with open(filepath, 'r') as f:
+            for line in f:
+                label = line.strip()
+                labels.append(label)
+        return labels
 
     def add_frame(self, frame):
         # Pré-processa o frame e adiciona à sequência
@@ -38,18 +52,13 @@ class ActivityDetector:
 
     def _process_outputs(self, outputs):
         # Implementa a lógica para mapear a saída para um rótulo de atividade
-        # Aqui, pode-se usar a função torch.argmax e um dicionário de labels
-        _, predicted = torch.max(outputs.data, 1)
-        activity_label = self._get_label(predicted.item())
+        probabilities = torch.nn.functional.softmax(outputs[0], dim=0)
+        top_prob, top_catid = torch.topk(probabilities, 1)
+        activity_label = self._get_label(top_catid.item())
         return activity_label
 
     def _get_label(self, index):
-        # Dicionário de mapeamento de índices para atividades
-        # Substitua pelos labels corretos do seu modelo
-        labels = {
-            0: 'aplaudindo',
-            1: 'andando',
-            2: 'correndo',
-            # Adicione outros labels conforme necessário
-        }
-        return labels.get(index, 'atividade_desconhecida')
+        if 0 <= index < len(self.labels):
+            return self.labels[index]
+        else:
+            return 'atividade_desconhecida'

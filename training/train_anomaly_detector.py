@@ -42,7 +42,7 @@ def collect_normal_data(video_path, num_samples=500):
 
         frame_count += 1
         # Processar apenas a cada N frames para acelerar
-        if frame_count % 10 != 0:
+        if frame_count % 6 != 0:
             continue
 
         # Converter o frame para RGB
@@ -110,7 +110,7 @@ def main():
 
     # Treinamento do modelo IsolationForest
     print("Treinando o modelo de detecção de anomalias...")
-    model = IsolationForest(contamination=0.01, n_estimators=200, random_state=42)
+    model = IsolationForest(contamination=0.01, n_estimators=500, random_state=42)
     model.fit(normal_vectors_pca)
 
     # Salvar o modelo treinado e os objetos de pré-processamento

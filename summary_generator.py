@@ -1,40 +1,53 @@
-from collections import Counter
+import os
 
 class SummaryGenerator:
     def __init__(self):
-        self.emotions_list = []
-        self.activities_list = []
-        self.anomalies_count = 0
         self.total_frames = 0
+        self.emotion_counts = {}
+        self.activity_counts = {}
+        self.anomaly_count = 0
 
-    def update(self, emotion, activity, anomaly_detected):
-        self.emotions_list.append(emotion)
-        self.activities_list.append(activity)
-        if anomaly_detected:
-            self.anomalies_count += 1
-        self.total_frames += 1
+    def update_emotion(self, emotion):
+        # Atualizar contagem de emoções
+        if emotion not in self.emotion_counts:
+            self.emotion_counts[emotion] = 0
+        self.emotion_counts[emotion] += 1
 
-    def generate_summary(self):
-        dominant_emotions = Counter(self.emotions_list).most_common()
-        dominant_activities = Counter(self.activities_list).most_common()
+    def update_activity(self, activity):
+        # Atualizar contagem de atividades
+        if activity not in self.activity_counts:
+            self.activity_counts[activity] = 0
+        self.activity_counts[activity] += 1
 
-        summary = f"""Resumo da Análise do Vídeo:
+    def update_anomaly(self):
+        # Atualizar contagem de anomalias
+        self.anomaly_count += 1
 
-- Total de frames analisados: {self.total_frames}
-- Emoções predominantes:
-"""
-        for emotion, count in dominant_emotions:
-            summary += f"  - {emotion}: {count} ocorrências\n"
+    def finalize(self):
+        pass
 
-        summary += "- Atividades predominantes:\n"
-        for activity, count in dominant_activities:
-            summary += f"  - {activity}: {count} ocorrências\n"
+    def save_summary(self):
+        project_root = os.path.dirname(os.path.abspath(__file__))
+        report_path = os.path.join(project_root, 'data', 'outputs', 'relatorio.txt')
+        with open(report_path, 'w') as f:
+            f.write(f"Total de frames processados: {self.total_frames}\n\n")
 
-        summary += f"- Número de anomalias detectadas (caretas): {self.anomalies_count}\n"
+            if self.emotion_counts:
+                f.write("Emoções detectadas:\n")
+                for emotion, count in self.emotion_counts.items():
+                    percentage = (count / self.total_frames) * 100
+                    f.write(f"- {emotion}: {count} frames ({percentage:.2f}%)\n")
+                f.write("\n")
+            else:
+                f.write("Nenhuma emoção detectada.\n\n")
 
-        return summary
+            if self.activity_counts:
+                f.write("Atividades detectadas:\n")
+                for activity, count in self.activity_counts.items():
+                    percentage = (count / self.total_frames) * 100
+                    f.write(f"- {activity}: {count} frames ({percentage:.2f}%)\n")
+                f.write("\n")
+            else:
+                f.write("Nenhuma atividade detectada.\n\n")
 
-    def save_summary(self, filename='relatorio.txt'):
-        summary = self.generate_summary()
-        with open(filename, 'w') as f:
-            f.write(summary)
+            f.write(f"Número de anomalias detectadas: {self.anomaly_count}\n")

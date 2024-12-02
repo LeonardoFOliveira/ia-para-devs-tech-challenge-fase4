@@ -1,0 +1,10 @@
+opencv-python
+dlib
+deepface
+torch
+torchvision
+joblib
+numpy
+pandas
+scikit-learn
+tf-keras

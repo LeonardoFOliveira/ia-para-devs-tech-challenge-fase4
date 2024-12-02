@@ -29,7 +29,7 @@ class SummaryGenerator:
     def save_summary(self):
         project_root = os.path.dirname(os.path.abspath(__file__))
         report_path = os.path.join(project_root, 'data', 'outputs', 'relatorio.txt')
-        with open(report_path, 'w') as f:
+        with open(report_path, 'w',  encoding='utf-8') as f:
             f.write(f"Total de frames processados: {self.total_frames}\n\n")
 
             if self.emotion_counts:

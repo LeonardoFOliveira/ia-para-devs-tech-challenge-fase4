@@ -33,6 +33,7 @@ def main():
     height = int(vp.cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
     out = cv2.VideoWriter(output_video_path, fourcc, fps, (width, height))
 
+    current_activity = None
     try:
         while True:
             frame = vp.get_next_frame()
@@ -67,20 +68,20 @@ def main():
 
                 # Detecção de atividades
                 if ad.add_frame(frame):
-                    activity = ad.detect_activity()
-                    if activity:
-                        # Exibir a atividade detectada no frame, na parte inferior
-                        cv2.putText(
-                            frame,
-                            f'Atividade: {activity}',
-                            (10, frame.shape[0] - 10),  # Posição no rodapé
-                            cv2.FONT_HERSHEY_SIMPLEX,
-                            0.9,
-                            (255, 255, 0),  # Cor do texto (amarelo)
-                            2
-                        )
-                        summary.update_activity(activity)
+                    current_activity = ad.detect_activity()
+                    if current_activity:
+                        summary.update_activity(current_activity)
                         activity_detected = True
+                # Exibir a atividade detectada no frame, na parte inferior
+                cv2.putText(
+                    frame,
+                    f'Atividade: {current_activity}',
+                    (10, frame.shape[0] - 10),  # Posição no rodapé
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    0.9,
+                    (255, 255, 0),  # Cor do texto
+                    2
+                )
 
                 # Detecção de anomalias
                 anomaly_detected = False

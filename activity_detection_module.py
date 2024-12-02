@@ -17,7 +17,7 @@ class ActivityDetector:
                 std=[0.22803, 0.22145, 0.216989]
             )
         ])
-        self.sequence_length = 16
+        self.sequence_length = 8
         self.frames = []
         # Carrega as labels do arquivo
         self.labels = self.load_labels('label_map.txt')

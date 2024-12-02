@@ -19,6 +19,11 @@ cd seu_repositorio
 ```
 
 2. Instale as dependências:
+  - Instale primeiramente o `face_recognition` sem chace:
+```bash
+pip install --no-cache-dir face_recognition
+```
+  - Instale as demais depedências pelo `requirements.txt`:
 ```bash
 pip install -r requirements.txt
 ```

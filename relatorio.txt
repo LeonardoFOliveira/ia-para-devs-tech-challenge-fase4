@@ -13,4 +13,4 @@ Resumo da Análise do Vídeo:
   - Analisando...: 2472 ocorrências
   - atividade_desconhecida: 149 ocorrências
   - correndo: 12 ocorrências
-- Número de anomalias detectadas (caretas): 7
+- Número de anomalias detectadas (caretas): 304

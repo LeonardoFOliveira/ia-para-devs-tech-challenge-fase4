@@ -1,6 +1,8 @@
 import cv2
 import joblib
 from sklearn.ensemble import IsolationForest
+from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
 import os
 import mediapipe as mp
 import numpy as np
@@ -31,6 +33,7 @@ def collect_normal_data(video_path, num_samples=500):
     # Inicializar o Face Mesh do MediaPipe
     mp_face_mesh = mp.solutions.face_mesh
     face_mesh = mp_face_mesh.FaceMesh(static_image_mode=True)
+    mp_face_detection = mp.solutions.face_detection
 
     while len(normal_vectors) < num_samples:
         ret, frame = cap.read()
@@ -45,7 +48,7 @@ def collect_normal_data(video_path, num_samples=500):
         # Converter o frame para RGB
         rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         # Detectar faces usando MediaPipe Face Detection
-        with mp.solutions.face_detection.FaceDetection(model_selection=1, min_detection_confidence=0.5) as face_detection:
+        with mp_face_detection.FaceDetection(model_selection=1, min_detection_confidence=0.5) as face_detection:
             results = face_detection.process(rgb_frame)
 
             if results.detections:
@@ -97,16 +100,28 @@ def main():
     # Converter a lista de vetores em um numpy array
     normal_vectors = np.array(normal_vectors)
 
+    # Pré-processamento dos dados
+    scaler = StandardScaler()
+    normal_vectors_scaled = scaler.fit_transform(normal_vectors)
+
+    # Reduzir a dimensionalidade com PCA
+    pca = PCA(n_components=50)  # Ajuste o número de componentes conforme necessário
+    normal_vectors_pca = pca.fit_transform(normal_vectors_scaled)
+
     # Treinamento do modelo IsolationForest
     print("Treinando o modelo de detecção de anomalias...")
-    model = IsolationForest(contamination=0.01, random_state=42)
-    model.fit(normal_vectors)
+    model = IsolationForest(contamination=0.01, n_estimators=200, random_state=42)
+    model.fit(normal_vectors_pca)
 
-    # Salvar o modelo treinado
+    # Salvar o modelo treinado e os objetos de pré-processamento
     models_dir = os.path.join(project_root, 'models')
     os.makedirs(models_dir, exist_ok=True)
     model_filename = os.path.join(models_dir, 'anomaly_detector_model.pkl')
-    joblib.dump(model, model_filename)
+    joblib.dump({
+        'model': model,
+        'scaler': scaler,
+        'pca': pca
+    }, model_filename)
     print(f"Modelo treinado salvo em '{model_filename}'.")
 
 if __name__ == '__main__':

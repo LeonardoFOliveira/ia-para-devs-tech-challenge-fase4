@@ -1,3 +1,5 @@
+# anomaly_detection_module.py
+
 import cv2
 import joblib
 import os
@@ -11,7 +13,10 @@ class AnomalyDetector:
             project_root = os.path.dirname(os.path.abspath(__file__))
             model_path = os.path.join(project_root, 'models', 'anomaly_detector_model.pkl')
         try:
-            self.model = joblib.load(model_path)
+            data = joblib.load(model_path)
+            self.model = data['model']
+            self.scaler = data['scaler']
+            self.pca = data['pca']
             logging.info("Modelo de detecção de anomalias carregado com sucesso.")
         except Exception as e:
             logging.error(f"Erro ao carregar o modelo de anomalias: {e}")
@@ -63,13 +68,17 @@ class AnomalyDetector:
             # Converter o vetor em numpy array e ajustar a forma
             vector = np.array(vector).reshape(1, -1)
 
+            # Aplicar o pré-processamento
+            vector_scaled = self.scaler.transform(vector)
+            vector_pca = self.pca.transform(vector_scaled)
+
             # Predizer anomalia
-            prediction = self.model.predict(vector)
+            prediction = self.model.predict(vector_pca)
             logging.debug(f"Predição de anomalia: {prediction}")
 
             if prediction[0] == -1:
                 logging.info("Anomalia detectada (careta).")
-                return True  # Anomalia detectada (careta)
+                return True  # Anomalia detectada
             else:
                 logging.debug("Nenhuma anomalia detectada.")
                 return False

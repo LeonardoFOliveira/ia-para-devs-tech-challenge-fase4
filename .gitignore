@@ -119,4 +119,7 @@ dmypy.json
 Thumbs.db
 
 # Data Files
-data/*
+data/**
+!data/
+!data/**/
+!data/**/README.md
